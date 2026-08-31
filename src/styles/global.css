@@ -1,0 +1,121 @@
+/*
+ * Bookee visual system.
+ *
+ *   tokens.css      every colour, size and spacing value
+ *   utilities.css   layout primitives (stack, row, grid, text)
+ *   components.css  the components themselves
+ *
+ * A desktop financial tool: system fonts, a dense ledger, restrained colour.
+ * Direction is never signalled by colour alone — a sign and a text label always
+ * accompany it.
+ */
+
+@import "./tokens.css";
+@import "./utilities.css";
+@import "./components.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  /* This is a fixed desktop shell, not a document. The window itself must never
+     scroll: when it can, reaching the end of the ledger chains the scroll to the
+     page and drags the sidebar and top bar off screen. */
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text);
+  background: var(--surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-tight);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* This is a keyboard-driven tool; focus is never hidden. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* The ring is drawn by the control itself for form elements. */
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* Scrollbars that match the surface rather than the OS default. */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid var(--surface);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.app-boot {
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  height: 100%;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.app-boot--error {
+  color: var(--negative);
+}

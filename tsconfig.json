@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    // ES2023 for the non-mutating array methods (toSorted). Every webview Tauri 2
+    // targets — WKWebView, WebView2, current WebKitGTK — supports them.
+    "target": "ES2023",
+    "useDefineForClassFields": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Type safety.
+     * noUncheckedIndexedAccess matters here: the SAC normalizer indexes into
+     * asset_balance_changes, and Horizon does not guarantee any given index exists. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // TypeScript 7 removed baseUrl; paths must be relative to this file.
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
+}

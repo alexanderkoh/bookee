@@ -1,0 +1,64 @@
+name: Bug report
+description: Something behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not report a security problem here.** Use a
+        [private advisory](https://github.com/alexanderkoh/bookee/security/advisories/new)
+        instead — see [SECURITY.md](../blob/main/SECURITY.md).
+
+        Please do not paste anything you would not want public. Screenshots of a
+        real ledger show your balances and counterparties; a redacted one is
+        just as useful.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: And what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Click …
+        3. …
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Bookee version
+      description: Shown at the bottom of the sidebar.
+      placeholder: v0.1.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Windows
+        - Linux
+        - Built from source
+    validations:
+      required: true
+
+  - type: textarea
+    id: data
+    attributes:
+      label: Anything the importer flagged
+      description: >
+        If it concerns imported data, the Data screen lists records the importer
+        could not interpret. Paste anything relevant — with addresses redacted if
+        you prefer.

@@ -1,0 +1,58 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883383028789249"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/af14fac850637ce0a00388d9009e5723ebcd9198964c0f8c4e71e329b0181499"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/274883383028789249/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883383028789249"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883383028789249"
+    }
+  },
+  "id": "274883383028789249",
+  "paging_token": "274883383028789249",
+  "transaction_successful": true,
+  "source_account": "GAYKXNTAGM6DCWB7I6YMIXC2TQUF37ZHV66SW6RIHYJGUZ2F6ETAYFZ3",
+  "type": "invoke_host_function",
+  "type_i": 24,
+  "created_at": "2026-08-17T21:40:27Z",
+  "transaction_hash": "af14fac850637ce0a00388d9009e5723ebcd9198964c0f8c4e71e329b0181499",
+  "function": "HostFunctionTypeHostFunctionTypeInvokeContract",
+  "parameters": [
+    {
+      "value": "AAAAEgAAAAHX/kS9CvEdYCsQkfL0ofTfIS1ETQMh6jKts8wcu6sKBA==",
+      "type": "Address"
+    },
+    {
+      "value": "AAAADwAAAAVwbGFudAAAAA==",
+      "type": "Sym"
+    },
+    {
+      "value": "AAAAEgAAAAAAAAAAFarjslv4LQ7JOIg2lTVfXWp19QjFfWb1lTOB89i/nMQ=",
+      "type": "Address"
+    },
+    {
+      "value": "AAAACgAAAAAAAAAAAAAAAABhmLM=",
+      "type": "I128"
+    }
+  ],
+  "address": "",
+  "salt": "",
+  "asset_balance_changes": [
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "KALE",
+      "asset_issuer": "GBDVX4VELCDSQ54KQJYTNHXAHFLBCA77ZY2USQBM4CSHTTV7DME7KALE",
+      "type": "burn",
+      "from": "GAK2VY5SLP4C2DWJHCEDNFJVL5OWU5PVBDCX2ZXVSUZYD46YX6OMIW3U",
+      "amount": "0.6396083"
+    }
+  ]
+}

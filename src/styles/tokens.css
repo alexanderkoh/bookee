@@ -1,0 +1,236 @@
+/*
+ * Design tokens.
+ *
+ * Every spacing, size, colour and radius decision in the application resolves
+ * to something declared here. Nothing is chosen ad hoc at the point of use —
+ * that is what makes separate screens read as one product rather than as
+ * several people's work.
+ *
+ * The ledger table stays dense. Surfaces where density buys nothing — the
+ * dashboard, onboarding, empty states — are allowed to breathe.
+ */
+
+:root {
+  /* ---- type ---- */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  /* Named explicitly so a glyph is rendered by the colour emoji font rather
+     than falling back to a text-style outline on some platforms. */
+  --font-emoji:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+
+  --text-2xs: 10.5px;
+  --text-xs: 11.5px;
+  --text-sm: 12.5px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 17px;
+  --text-xl: 21px;
+  --text-2xl: 26px;
+  --text-3xl: 32px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ---- spacing: a 4px rhythm ---- */
+  --space-0: 0;
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --space-7: 20px;
+  --space-8: 24px;
+  --space-9: 32px;
+  --space-10: 40px;
+  --space-11: 56px;
+
+  /* ---- shape ---- */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+
+  /* ---- density ---- */
+  --row-height: 34px;
+  --control-height: 28px;
+  --sidebar-width: 216px;
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 90ms;
+  --duration: 150ms;
+
+  /* ================= light ================= */
+
+  --surface: #ffffff;
+  --surface-sunken: #f6f7f9;
+  --surface-raised: #ffffff;
+  --surface-overlay: #ffffff;
+  --surface-hover: #f0f2f5;
+  --surface-active: #e7eaef;
+  --surface-selected: #e9f0fb;
+
+  --border: #e3e6eb;
+  --border-strong: #cbd1da;
+  --border-accent: #b8ccf2;
+
+  --text: #14171c;
+  --text-secondary: #58616f;
+  --text-muted: #838c9a;
+  --text-inverse: #ffffff;
+
+  /* A single accent, used with more presence than before: it carries the
+     primary action, the active nav item and the focus ring. */
+  --accent: #2b5fd9;
+  --accent-hover: #2452c2;
+  --accent-text: #ffffff;
+  --accent-subtle: #eaf0fd;
+  --accent-border: #c3d5f7;
+
+  --positive: #10704a;
+  --positive-subtle: #e6f4ed;
+  --negative: #a52d26;
+  --negative-subtle: #fbeceb;
+  --warning: #8a5300;
+  --warning-subtle: #fdf2e3;
+
+  /* Depth is used sparingly and only where something genuinely floats. */
+  --shadow-sm: 0 1px 2px rgb(20 23 28 / 6%);
+  --shadow: 0 1px 3px rgb(20 23 28 / 8%), 0 4px 12px rgb(20 23 28 / 6%);
+  --shadow-lg: 0 2px 6px rgb(20 23 28 / 10%), 0 16px 40px rgb(20 23 28 / 14%);
+
+  --backdrop: rgb(16 19 24 / 34%);
+
+  color-scheme: light;
+}
+
+/* ================= dark ================= */
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --surface: #15171c;
+    --surface-sunken: #0f1115;
+    --surface-raised: #1a1d23;
+    --surface-overlay: #1e222a;
+    --surface-hover: #22262e;
+    --surface-active: #2a2f39;
+    --surface-selected: #22304b;
+
+    --border: #282c34;
+    --border-strong: #3a404b;
+    --border-accent: #35507f;
+
+    --text: #e9ebef;
+    --text-secondary: #a3acba;
+    --text-muted: #79828f;
+    --text-inverse: #0d1017;
+
+    --accent: #6f9dff;
+    --accent-hover: #85adff;
+    --accent-text: #0c1220;
+    --accent-subtle: #1a2439;
+    --accent-border: #2f4676;
+
+    --positive: #5cc79a;
+    --positive-subtle: #12261e;
+    --negative: #f0837a;
+    --negative-subtle: #2a1816;
+    --warning: #dfae5e;
+    --warning-subtle: #251f0f;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow: 0 1px 3px rgb(0 0 0 / 45%), 0 4px 12px rgb(0 0 0 / 35%);
+    --shadow-lg: 0 2px 8px rgb(0 0 0 / 50%), 0 16px 40px rgb(0 0 0 / 45%);
+
+    --backdrop: rgb(0 0 0 / 55%);
+  }
+}
+
+/* An explicit choice always wins over the system preference. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface: #15171c;
+  --surface-sunken: #0f1115;
+  --surface-raised: #1a1d23;
+  --surface-overlay: #1e222a;
+  --surface-hover: #22262e;
+  --surface-active: #2a2f39;
+  --surface-selected: #22304b;
+
+  --border: #282c34;
+  --border-strong: #3a404b;
+  --border-accent: #35507f;
+
+  --text: #e9ebef;
+  --text-secondary: #a3acba;
+  --text-muted: #79828f;
+  --text-inverse: #0d1017;
+
+  --accent: #6f9dff;
+  --accent-hover: #85adff;
+  --accent-text: #0c1220;
+  --accent-subtle: #1a2439;
+  --accent-border: #2f4676;
+
+  --positive: #5cc79a;
+  --positive-subtle: #12261e;
+  --negative: #f0837a;
+  --negative-subtle: #2a1816;
+  --warning: #dfae5e;
+  --warning-subtle: #251f0f;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow: 0 1px 3px rgb(0 0 0 / 45%), 0 4px 12px rgb(0 0 0 / 35%);
+  --shadow-lg: 0 2px 8px rgb(0 0 0 / 50%), 0 16px 40px rgb(0 0 0 / 45%);
+
+  --backdrop: rgb(0 0 0 / 55%);
+}
+
+/* ================= chart palette =================
+ *
+ * A validated diverging pair, deliberately NOT the ledger's green/red: that
+ * pair measures ΔE 5.9 under deuteranopia, below the 6.0 floor, so it cannot
+ * carry meaning where the mark is the message. These measure 23.8 (light) and
+ * 20.2 (dark). In the table green/red is fine — a sign and a text label carry
+ * the meaning there.
+ */
+:root {
+  --chart-in: #2a78d6;
+  --chart-out: #d03b3b;
+  --chart-hue: #2a78d6;
+  --chart-grid: var(--border);
+  --chart-baseline: var(--border-strong);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Selected for the dark surface, not flipped: the light steps sit outside
+       the dark lightness band. */
+    --chart-in: #3987e5;
+    --chart-out: #e35f5f;
+    --chart-hue: #3987e5;
+  }
+}
+
+:root[data-theme="dark"] {
+  --chart-in: #3987e5;
+  --chart-out: #e35f5f;
+  --chart-hue: #3987e5;
+}

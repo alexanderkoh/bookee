@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "unicorn", "oxc"],
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn"
+  },
+  "rules": {
+    // The automatic JSX runtime (jsx: "react-jsx") is in use, so React does not
+    // need to be imported for JSX to work.
+    "react/react-in-jsx-scope": "off",
+    // Horizon's JSON uses _embedded and _links; those names are not ours to change.
+    "no-underscore-dangle": "off",
+    // Sequential awaits are deliberate here. Cursor-based pagination cannot be
+    // parallelised, and firing page requests concurrently would hammer Horizon.
+    "no-await-in-loop": "off",
+    "no-console": "warn",
+    "eqeqeq": "error",
+    "no-var": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "error",
+    "unicorn/no-array-for-each": "off",
+    "unicorn/prefer-query-selector": "off",
+    "unicorn/filename-case": "off"
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.ts", "tests/**/*.tsx", "scripts/**/*.mjs"],
+      "rules": {
+        "no-console": "off",
+        "typescript/no-explicit-any": "off",
+        "unicorn/consistent-function-scoping": "off"
+      }
+    },
+    {
+      "files": ["src/lib/log.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist", "node_modules", "src-tauri/target", "tests/fixtures"]
+}

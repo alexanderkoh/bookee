@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883357258027009"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/e87b449b5784b66c242970ccc7f1c1bea0ed90de9c9844ccc580b644a03fd904"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/274883357258027009/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883357258027009"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883357258027009"
+    }
+  },
+  "id": "274883357258027009",
+  "paging_token": "274883357258027009",
+  "transaction_successful": true,
+  "source_account": "GBZ3PVWIIGIFEJT465XJOB23CTVHE7CUNUW4KY3A6ZAL4NHCL36J5LRE",
+  "type": "account_merge",
+  "type_i": 8,
+  "created_at": "2026-08-17T21:39:53Z",
+  "transaction_hash": "e87b449b5784b66c242970ccc7f1c1bea0ed90de9c9844ccc580b644a03fd904",
+  "account": "GBZ3PVWIIGIFEJT465XJOB23CTVHE7CUNUW4KY3A6ZAL4NHCL36J5LRE",
+  "into": "GCWB3T4MQEGXN6SYLRS35IRQSBA7P5GKYVGXNAJQXM6WIRVIIY6SXDJL"
+}

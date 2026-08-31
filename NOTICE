@@ -1,0 +1,50 @@
+Bookee: Stellar Bookkeeping
+Copyright 2026 Bastian Alexander Koh
+
+This product includes software developed by Bastian Alexander Koh
+(https://github.com/alexanderkoh/bookee).
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+---
+
+TRADEMARKS
+
+The Apache License does not grant permission to use the trade names,
+trademarks, service marks, or product names of the licensor (Section 6).
+
+The name "Bookee" and the Bookee hedgehog logo (assets/logo.png and the icon
+set derived from it in src-tauri/icons/) are not covered by the Apache License.
+
+You may:
+  - fork, modify and redistribute the source code under Apache-2.0
+  - state accurately that your work is derived from or based on Bookee
+
+Please do not:
+  - publish a modified build under the name "Bookee"
+  - use the hedgehog logo as the icon of a different application
+  - imply endorsement by, or affiliation with, this project
+
+Rename your fork and swap the icon. That is the whole ask.
+
+---
+
+THIRD-PARTY SOFTWARE
+
+This project depends on open-source software listed in package.json and
+src-tauri/Cargo.toml, each under its own license. Their notices are not
+reproduced here; consult the respective packages.
+
+Asset icons for Stellar assets are fetched at runtime from the issuer's
+stellar.toml (SEP-1) and belong to their respective issuers. Two are bundled
+because their published metadata does not resolve: the Stellar (XLM) mark and
+the USDC mark, both used nominatively to identify the asset.
+
+---
+
+NOT AFFILIATED WITH THE STELLAR DEVELOPMENT FOUNDATION
+
+Bookee is an independent project. It is not endorsed by, affiliated with, or
+supported by the Stellar Development Foundation, Circle, or any asset issuer
+whose marks may appear in the application.

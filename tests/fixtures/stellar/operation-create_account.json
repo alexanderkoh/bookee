@@ -1,0 +1,31 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883378732810242"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/149a64b3c40f7c10ae677292fb4b08bc7a0bdeb34c631d2fe78727a4efca7cb8"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/274883378732810242/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883378732810242"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883378732810242"
+    }
+  },
+  "id": "274883378732810242",
+  "paging_token": "274883378732810242",
+  "transaction_successful": true,
+  "source_account": "GBELHFUGJ2B2AIETGA3AUXJPL7PYVSMZB5ZAEZUQMDOSM727P3RAFVUS",
+  "type": "create_account",
+  "type_i": 0,
+  "created_at": "2026-08-17T21:40:21Z",
+  "transaction_hash": "149a64b3c40f7c10ae677292fb4b08bc7a0bdeb34c631d2fe78727a4efca7cb8",
+  "sponsor": "GBELHFUGJ2B2AIETGA3AUXJPL7PYVSMZB5ZAEZUQMDOSM727P3RAFVUS",
+  "starting_balance": "0.0000000",
+  "funder": "GBELHFUGJ2B2AIETGA3AUXJPL7PYVSMZB5ZAEZUQMDOSM727P3RAFVUS",
+  "account": "GAABU4NUI6JAYI4EGBAGJNPJ5VSIOXQOGRVP2XTSMGWB3LKLMWP6MNUT"
+}

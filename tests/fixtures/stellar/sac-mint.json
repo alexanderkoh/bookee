@@ -1,0 +1,74 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883383028764673"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/9b11258d01b1bf74ad97eaeadb8f27d03b5452d41df2bf65aa6e8123c54eb617"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/274883383028764673/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883383028764673"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883383028764673"
+    }
+  },
+  "id": "274883383028764673",
+  "paging_token": "274883383028764673",
+  "transaction_successful": true,
+  "source_account": "GCMZ5T5LSVHAPUVOEUDXZ472IOWBRVNSWYSJCSFNJXFZEJ3EGHSVVJBN",
+  "type": "invoke_host_function",
+  "type_i": 24,
+  "created_at": "2026-08-17T21:40:27Z",
+  "transaction_hash": "9b11258d01b1bf74ad97eaeadb8f27d03b5452d41df2bf65aa6e8123c54eb617",
+  "function": "HostFunctionTypeHostFunctionTypeInvokeContract",
+  "parameters": [
+    {
+      "value": "AAAAEgAAAAFNIKsMw7zmGPC92uDE1aDLQdRausW5Xc3sdSbdC4/uJQ==",
+      "type": "Address"
+    },
+    {
+      "value": "AAAADwAAAAdoYXJ2ZXN0AA==",
+      "type": "Sym"
+    },
+    {
+      "value": "AAAAEgAAAAAAAAAAlHRt62bouBingeCrD+lPGODoq8kx5ZK7teg5iH/SnFo=",
+      "type": "Address"
+    },
+    {
+      "value": "AAAAEAAAAAEAAAADAAAAAwACssYAAAADAAKyxwAAAAMAArLI",
+      "type": "Vec"
+    }
+  ],
+  "address": "",
+  "salt": "",
+  "asset_balance_changes": [
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "KALE",
+      "asset_issuer": "GBDVX4VELCDSQ54KQJYTNHXAHFLBCA77ZY2USQBM4CSHTTV7DME7KALE",
+      "type": "mint",
+      "to": "GCKHI3PLM3ULQGFHQHQKWD7JJ4MOB2FLZEY6LEV3WXUDTCD72KOFUN3C",
+      "amount": "0.1536226"
+    },
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "KALE",
+      "asset_issuer": "GBDVX4VELCDSQ54KQJYTNHXAHFLBCA77ZY2USQBM4CSHTTV7DME7KALE",
+      "type": "mint",
+      "to": "GCKHI3PLM3ULQGFHQHQKWD7JJ4MOB2FLZEY6LEV3WXUDTCD72KOFUN3C",
+      "amount": "0.2137113"
+    },
+    {
+      "asset_type": "credit_alphanum4",
+      "asset_code": "KALE",
+      "asset_issuer": "GBDVX4VELCDSQ54KQJYTNHXAHFLBCA77ZY2USQBM4CSHTTV7DME7KALE",
+      "type": "mint",
+      "to": "GCKHI3PLM3ULQGFHQHQKWD7JJ4MOB2FLZEY6LEV3WXUDTCD72KOFUN3C",
+      "amount": "0.2196363"
+    }
+  ]
+}

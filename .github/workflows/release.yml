@@ -1,0 +1,126 @@
+name: Release
+
+# Builds installers for every desktop platform and attaches them to a draft
+# release. Each platform must be built on its own runner — Tauri cannot
+# cross-compile a macOS app from Linux, and vice versa.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Apple Silicon and Intel are separate binaries. Building both and
+          # letting Tauri merge them gives one universal .dmg that runs on
+          # either, at the cost of size.
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+            name: macOS (universal)
+          - platform: ubuntu-22.04
+            args: ""
+            name: Linux (deb, rpm, AppImage)
+          - platform: windows-latest
+            args: ""
+            name: Windows (msi, exe)
+
+    runs-on: ${{ matrix.platform }}
+    name: ${{ matrix.name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          # The universal build needs both Apple architectures.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libssl-dev
+
+      - run: pnpm install --frozen-lockfile
+
+      # Signing is optional, but the variables must be ABSENT rather than empty
+      # when it is not configured: Tauri treats a defined-but-empty
+      # APPLE_CERTIFICATE as "signing was requested" and fails the bundle step
+      # trying to import a certificate that does not exist. Exporting them only
+      # when non-empty is what lets an unsigned build succeed.
+      - name: Configure signing, if certificates are available
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then
+            echo "Apple certificate found — building signed."
+            {
+              echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+              echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+              echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+              echo "APPLE_ID=$APPLE_ID"
+              echo "APPLE_PASSWORD=$APPLE_PASSWORD"
+              echo "APPLE_TEAM_ID=$APPLE_TEAM_ID"
+            } >> "$GITHUB_ENV"
+          else
+            echo "No Apple certificate configured — building unsigned."
+            echo "Users will need to right-click → Open on first launch."
+          fi
+
+          if [ -n "$WINDOWS_CERTIFICATE" ]; then
+            echo "Windows certificate found — building signed."
+            {
+              echo "WINDOWS_CERTIFICATE=$WINDOWS_CERTIFICATE"
+              echo "WINDOWS_CERTIFICATE_PASSWORD=$WINDOWS_CERTIFICATE_PASSWORD"
+            } >> "$GITHUB_ENV"
+          fi
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Bookee ${{ github.ref_name }}"
+          releaseBody: |
+            Local-first, read-only bookkeeping for Stellar accounts.
+
+            **macOS**: download the `.dmg`, drag Bookee to Applications.
+            **Windows**: download the `.msi` or `.exe` installer.
+            **Linux**: `.AppImage` runs anywhere; `.deb` and `.rpm` for apt/dnf.
+
+            See the installation notes if your system warns that the app is
+            from an unidentified developer.
+          releaseDraft: true
+          prerelease: true
+          args: ${{ matrix.args }}
