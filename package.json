@@ -45,7 +45,7 @@
     "@sqlite.org/sqlite-wasm": "3.53.0-build1",
     "@tauri-apps/cli": "^2.11.4",
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/big.js": "^6.2.2",
