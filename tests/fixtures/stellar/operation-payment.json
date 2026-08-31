@@ -1,0 +1,33 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883383027994625"
+    },
+    "transaction": {
+      "href": "https://horizon.stellar.org/transactions/a9c18e3bafc2c3501d9043273a8a4eb6ab8be3633b8b3306e866e760d6d7f3ef"
+    },
+    "effects": {
+      "href": "https://horizon.stellar.org/operations/274883383027994625/effects"
+    },
+    "succeeds": {
+      "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883383027994625"
+    },
+    "precedes": {
+      "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883383027994625"
+    }
+  },
+  "id": "274883383027994625",
+  "paging_token": "274883383027994625",
+  "transaction_successful": true,
+  "source_account": "GAUA7XL5K54CC2DDGP77FJ2YBHRJLT36CPZDXWPM6MP7MANOGG77PNJU",
+  "type": "payment",
+  "type_i": 1,
+  "created_at": "2026-08-17T21:40:27Z",
+  "transaction_hash": "a9c18e3bafc2c3501d9043273a8a4eb6ab8be3633b8b3306e866e760d6d7f3ef",
+  "asset_type": "credit_alphanum4",
+  "asset_code": "USDC",
+  "asset_issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+  "from": "GAUA7XL5K54CC2DDGP77FJ2YBHRJLT36CPZDXWPM6MP7MANOGG77PNJU",
+  "to": "GAQ53YUIVQKQ2CZJJ7QSHDPWM3E4JLNZINK24T3LD2RXNSNZFC6WTJ4N",
+  "amount": "3.6100000"
+}

@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest something Bookee should do
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Some things are deliberately out of scope and will be declined however
+        well argued: **handling secret keys, signing or sending transactions,
+        cloud sync, accounts, and telemetry.** Totalling different assets into a
+        single portfolio figure is also out — 5 XLM plus 5 USDC is not 10 of
+        anything.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The bookkeeping problem, not the feature. It usually suggests a better solution than the one either of us thought of first.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How you handle it today

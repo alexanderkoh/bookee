@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Stellar Ledger app icon.
+       A ledger read as bars of value, with one star marking the account being
+       tracked. Flat, high-contrast, legible at 32px. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f66e0"/>
+      <stop offset="1" stop-color="#1e40a8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+
+  <!-- ledger rows: ascending bars, the shape of a book of accounts -->
+  <g fill="#ffffff">
+    <rect x="236" y="620" width="112" height="196" rx="34" opacity="0.55"/>
+    <rect x="404" y="520" width="112" height="296" rx="34" opacity="0.75"/>
+    <rect x="572" y="404" width="112" height="412" rx="34" opacity="0.92"/>
+  </g>
+
+  <!-- the tracked account -->
+  <path fill="#ffffff"
+        d="M740 196
+           l30.5 78.5 78.5 30.5 -78.5 30.5 -30.5 78.5 -30.5 -78.5 -78.5 -30.5 78.5 -30.5 Z"/>
+</svg>

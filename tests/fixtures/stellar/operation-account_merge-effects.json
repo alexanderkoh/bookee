@@ -1,0 +1,78 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/operations/274883357258027009/effects?cursor=&limit=200&order=asc"
+    },
+    "next": {
+      "href": "https://horizon.stellar.org/operations/274883357258027009/effects?cursor=274883357258027009-3&limit=200&order=asc"
+    },
+    "prev": {
+      "href": "https://horizon.stellar.org/operations/274883357258027009/effects?cursor=274883357258027009-1&limit=200&order=desc"
+    }
+  },
+  "_embedded": {
+    "records": [
+      {
+        "_links": {
+          "operation": {
+            "href": "https://horizon.stellar.org/operations/274883357258027009"
+          },
+          "succeeds": {
+            "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883357258027009-1"
+          },
+          "precedes": {
+            "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883357258027009-1"
+          }
+        },
+        "id": "0274883357258027009-0000000001",
+        "paging_token": "274883357258027009-1",
+        "account": "GBZ3PVWIIGIFEJT465XJOB23CTVHE7CUNUW4KY3A6ZAL4NHCL36J5LRE",
+        "type": "account_debited",
+        "type_i": 3,
+        "created_at": "2026-08-17T21:39:53Z",
+        "asset_type": "native",
+        "amount": "1.4989800"
+      },
+      {
+        "_links": {
+          "operation": {
+            "href": "https://horizon.stellar.org/operations/274883357258027009"
+          },
+          "succeeds": {
+            "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883357258027009-2"
+          },
+          "precedes": {
+            "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883357258027009-2"
+          }
+        },
+        "id": "0274883357258027009-0000000002",
+        "paging_token": "274883357258027009-2",
+        "account": "GCWB3T4MQEGXN6SYLRS35IRQSBA7P5GKYVGXNAJQXM6WIRVIIY6SXDJL",
+        "type": "account_credited",
+        "type_i": 2,
+        "created_at": "2026-08-17T21:39:53Z",
+        "asset_type": "native",
+        "amount": "1.4989800"
+      },
+      {
+        "_links": {
+          "operation": {
+            "href": "https://horizon.stellar.org/operations/274883357258027009"
+          },
+          "succeeds": {
+            "href": "https://horizon.stellar.org/effects?order=desc&cursor=274883357258027009-3"
+          },
+          "precedes": {
+            "href": "https://horizon.stellar.org/effects?order=asc&cursor=274883357258027009-3"
+          }
+        },
+        "id": "0274883357258027009-0000000003",
+        "paging_token": "274883357258027009-3",
+        "account": "GBZ3PVWIIGIFEJT465XJOB23CTVHE7CUNUW4KY3A6ZAL4NHCL36J5LRE",
+        "type": "account_removed",
+        "type_i": 1,
+        "created_at": "2026-08-17T21:39:53Z"
+      }
+    ]
+  }
+}
