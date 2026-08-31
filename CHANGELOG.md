@@ -59,7 +59,7 @@ to you.
   code units, so pasting 🏳️‍🌈 stored a flag followed by a dangling zero-width
   joiner. It now clamps to the first grapheme cluster.
 
-## [0.1.0] — 2026-08-19
+## 0.1.0 — 2026-08-19
 
 First release. Local-first, read-only bookkeeping for Stellar accounts.
 
@@ -83,5 +83,4 @@ First release. Local-first, read-only bookkeeping for Stellar accounts.
 - Installers for macOS, Windows and Linux
 
 [Unreleased]: https://github.com/alexanderkoh/bookee/compare/v0.1.1...HEAD
-[0.1.1]: https://github.com/alexanderkoh/bookee/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.0
+[0.1.1]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.1
