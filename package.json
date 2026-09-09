@@ -1,7 +1,7 @@
 {
   "name": "bookee",
   "private": true,
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "description": "Bookee — local-first, read-only bookkeeping for Stellar accounts.",
   "license": "Apache-2.0",
