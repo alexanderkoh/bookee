@@ -3,7 +3,14 @@
  * database stores.
  */
 import type { Amount } from "../lib/money";
-import type { CategoryKind, Direction, MemoType, MovementType, Network } from "../db/schema";
+import type {
+  CategoryKind,
+  Direction,
+  ExclusionReason,
+  MemoType,
+  MovementType,
+  Network,
+} from "../db/schema";
 
 /**
  * A ledger entry with its human context already resolved.
@@ -44,6 +51,7 @@ export interface LedgerEntryView {
   categoryKind: CategoryKind | null;
   note: string | null;
   excluded: boolean;
+  exclusionReason: ExclusionReason | null;
   reimbursable: boolean;
 }
 
@@ -62,6 +70,8 @@ export interface LedgerFilters {
   /** Matches contact name, address, memo, transaction hash and note. */
   search?: string | undefined;
   includeExcluded?: boolean | undefined;
+  /** Narrows to one kind of exclusion. Implies includeExcluded. */
+  exclusionReason?: ExclusionReason | undefined;
 }
 
 export interface Page {

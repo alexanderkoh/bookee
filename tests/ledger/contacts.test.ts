@@ -288,6 +288,46 @@ describe("naming unknown parties from the ledger", () => {
     expect(unnamed.map((party) => party.address)).not.toContain(second.publicKey);
   });
 
+  it("stops asking once every entry from an address is excluded", async () => {
+    // The point of marking spam: it has to make the sender go away. Before the
+    // exclusion clause existed, the list ignored annotations entirely, so
+    // excluding dust hid the rows but left the sender — and the badge — exactly
+    // as they were, which made the whole action look broken.
+    const entries = await repos.entries.query(
+      { workspaceId: workspace.id, includeExcluded: true },
+      { limit: 100, offset: 0 },
+    );
+    const fromOther = entries.filter((entry) => entry.counterpartyAddress === OTHER);
+    expect(fromOther.length).toBeGreaterThan(0);
+
+    for (const entry of fromOther) {
+      await repos.annotations.setManual(entry.id, { excluded: true, exclusionReason: "spam" });
+    }
+
+    const remaining = await repos.contacts.unnamedCounterparties(workspace.id);
+    expect(remaining.map((party) => party.address)).not.toContain(OTHER);
+    // The counterparty that was left alone is untouched.
+    expect(remaining.map((party) => party.address)).toContain(EMILE);
+  });
+
+  it("keeps asking while an address still has entries that count", async () => {
+    const entries = await repos.entries.query(
+      { workspaceId: workspace.id, includeExcluded: true },
+      { limit: 100, offset: 0 },
+    );
+    const fromEmile = entries.filter((entry) => entry.counterpartyAddress === EMILE);
+    await repos.annotations.setManual(fromEmile[0]!.id, {
+      excluded: true,
+      exclusionReason: "spam",
+    });
+
+    const remaining = await repos.contacts.unnamedCounterparties(workspace.id);
+    const emile = remaining.find((party) => party.address === EMILE);
+    expect(emile).toBeDefined();
+    // Three entries, one excluded.
+    expect(emile!.entryCount).toBe(2);
+  });
+
   it("reports the span of activity so an address can be judged before naming", async () => {
     const [busiest] = await repos.contacts.unnamedCounterparties(workspace.id);
     expect(busiest!.firstSeen <= busiest!.lastSeen).toBe(true);

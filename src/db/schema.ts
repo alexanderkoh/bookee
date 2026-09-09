@@ -37,6 +37,15 @@ export type AnnotationSource = "manual" | "rule";
 
 export type MemoType = "none" | "text" | "id" | "hash" | "return";
 
+/**
+ * Why an entry is excluded. Only meaningful when `excluded` is true, and null
+ * on rows written before the distinction existed.
+ *
+ * "personal" is a decision about your books; "spam" is a statement about the
+ * transaction — dust you did not ask for, usually advertising something.
+ */
+export type ExclusionReason = "personal" | "spam";
+
 export interface Workspace {
   id: string;
   name: string;
@@ -100,6 +109,7 @@ export interface EntryAnnotation {
   categoryId: string | null;
   note: string | null;
   excluded: boolean;
+  exclusionReason: ExclusionReason | null;
   reimbursable: boolean;
   contactSource: AnnotationSource | null;
   categorySource: AnnotationSource | null;

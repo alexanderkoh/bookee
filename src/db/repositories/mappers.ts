@@ -92,6 +92,7 @@ export function mapAnnotation(row: Row): EntryAnnotation {
     categoryId: row["category_id"] ?? null,
     note: row["note"] ?? null,
     excluded: fromDbBool(row["excluded"]),
+    exclusionReason: row["exclusion_reason"] ?? null,
     reimbursable: fromDbBool(row["reimbursable"]),
     contactSource: row["contact_source"] ?? null,
     categorySource: row["category_source"] ?? null,

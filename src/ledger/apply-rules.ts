@@ -46,6 +46,9 @@ export async function applyRules(
         ...(outcome.categoryId !== undefined ? { categoryId: outcome.categoryId } : {}),
         ...(outcome.note !== undefined ? { note: outcome.note } : {}),
         ...(outcome.excluded !== undefined ? { excluded: outcome.excluded } : {}),
+        ...(outcome.exclusionReason !== undefined
+          ? { exclusionReason: outcome.exclusionReason }
+          : {}),
       },
       outcome.ruleId,
     );

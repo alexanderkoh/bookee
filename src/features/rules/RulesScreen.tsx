@@ -39,6 +39,7 @@ const ACTION_LABELS: Record<ActionType, string> = {
   set_category: "Set category",
   set_note: "Set note",
   set_excluded: "Exclude from reports",
+  set_spam: "Mark as spam",
 };
 
 export function RulesScreen() {
@@ -214,6 +215,8 @@ function describeAction(
       return `note = "${action.value}"`;
     case "set_excluded":
       return action.value === "true" ? "excluded" : "not excluded";
+    case "set_spam":
+      return "marked as spam";
   }
 }
 
