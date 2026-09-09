@@ -11,6 +11,8 @@ to you.
 
 ## [Unreleased]
 
+## [0.1.4] — 2026-09-09
+
 ### Added
 
 - **Spam triage.** Contacts now surfaces counterparties that look like
@@ -125,6 +127,7 @@ First release. Local-first, read-only bookkeeping for Stellar accounts.
 - Multiple independent ledgers
 - Installers for macOS, Windows and Linux
 
-[Unreleased]: https://github.com/alexanderkoh/bookee/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/alexanderkoh/bookee/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.4
 [0.1.3]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.3
 [0.1.2]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.2
