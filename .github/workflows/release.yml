@@ -66,6 +66,22 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # createUpdaterArtifacts is on in tauri.conf.json, and Tauri refuses to
+      # produce an unsigned update. Checking here turns what would otherwise be
+      # a cryptic failure deep in the bundle step into one legible line.
+      - name: Require the updater signing key
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::TAURI_SIGNING_PRIVATE_KEY is not set. In-app updates are"
+            echo "::error::signed with it, and the bundle step cannot produce an"
+            echo "::error::updater artifact without it. Add the repository secret"
+            echo "::error::(and TAURI_SIGNING_PRIVATE_KEY_PASSWORD) before releasing."
+            exit 1
+          fi
+
       # Signing is optional, but the variables must be ABSENT rather than empty
       # when it is not configured: Tauri treats a defined-but-empty
       # APPLE_CERTIFICATE as "signing was requested" and fails the bundle step
@@ -109,6 +125,11 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the updater artifacts. The matching public key is in
+          # tauri.conf.json, and the installed app verifies against it before
+          # replacing anything.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Bookee ${{ github.ref_name }}"
@@ -123,4 +144,9 @@ jobs:
             from an unidentified developer.
           releaseDraft: true
           prerelease: true
+          # Emits latest.json alongside the installers. The app polls it at
+          # releases/latest/download/latest.json, which GitHub resolves only for
+          # a release that is published and NOT flagged as a prerelease — so
+          # clearing both flags when you publish is what turns updates on.
+          includeUpdaterJson: true
           args: ${{ matrix.args }}

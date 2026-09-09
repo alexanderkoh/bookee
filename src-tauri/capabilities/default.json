@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Least-privilege capability set for the main window. SQLite access, file open/save dialogs for ledger import/export, reading and writing only the files the user picks in those dialogs, and opening external links. No shell execution, no arbitrary filesystem access, no wallet or device APIs.",
+  "description": "Least-privilege capability set for the main window. SQLite access, file open/save dialogs for ledger import/export, reading and writing only the files the user picks in those dialogs, and opening external links. Checking for and installing a signed update, and the restart that follows it. No shell execution, no arbitrary filesystem access, no wallet or device APIs.",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -14,6 +14,8 @@
     "dialog:allow-save",
     "fs:allow-read-text-file",
     "fs:allow-write-text-file",
-    "opener:allow-open-url"
+    "opener:allow-open-url",
+    "updater:default",
+    "process:allow-restart"
   ]
 }

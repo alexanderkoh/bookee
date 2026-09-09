@@ -180,7 +180,11 @@ Requests do leave your machine, and it is worth being precise about which:
   see which accounts interest you and when
 - **An asset issuer's domain**, and whatever host its `stellar.toml` names for the
   icon — held to `https`, and cached after the first fetch
-- **`api.github.com`** — a version check against the latest release
+- **`api.github.com`** — a version check against the latest release, once a day,
+  and only until you turn it off in Settings
+- **`github.com` release assets** — only if you press the button to install an
+  update, and only the installer itself. Bookee verifies it against the
+  project's signing key before replacing anything
 
 Nothing you write is included in any of them. Portable backups **do** contain
 your notes, contact names, categories and address mappings — you are warned
