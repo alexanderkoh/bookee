@@ -1848,3 +1848,42 @@
 .disclosure--open {
   transform: rotate(90deg);
 }
+
+/* ================= bulk selection ================= */
+
+.col-tick {
+  width: 34px;
+}
+
+/* Sits between the filters and the table, so the count and the actions are
+   next to the rows they apply to rather than at the far end of the page. */
+.selection-bar {
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+}
+
+.plain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A quiet in-panel toggle: this is a side note about an account, not a section
+   heading competing with the account's own name. */
+.disclosure-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.disclosure-button:hover {
+  color: var(--text);
+}

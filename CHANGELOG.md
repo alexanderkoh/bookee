@@ -17,7 +17,12 @@ to you.
   unsolicited dust, with the reasons spelled out, and marking one writes a rule
   so the next batch from the same sender is handled too. Nothing is ever hidden
   automatically — the suggestion is shown, the judgement stays yours, and
-  "not spam, name them" removes it from the list just as effectively.
+  "not spam, name them" removes it from the list just as effectively. Reachable
+  from four places: the Contacts panel, a transaction's detail drawer (marking
+  either the sender or the whole asset), a multi-row selection in the ledger,
+  and per tracked account, since one published address collects far more junk
+  than the rest. The ledger's status filter gained "Marked as spam" so what was
+  caught can be reviewed and put back.
   Exclusions now record *why*, so "kept out of my books" and "not my
   transaction" are no longer the same flag.
 

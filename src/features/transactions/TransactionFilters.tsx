@@ -203,12 +203,23 @@ export function TransactionFilters({
         <select
           id="filter-status"
           className="select"
-          value={filters.status ?? "all"}
-          onChange={(event) => onChange({ status: event.target.value as CategorizationStatus })}
+          // Spam is a different axis to categorisation, but "what am I looking
+          // at" is one question to the person using it, so the two share a
+          // control and the mapping happens here rather than in their head.
+          value={filters.exclusionReason === "spam" ? "spam" : (filters.status ?? "all")}
+          onChange={(event) => {
+            const value = event.target.value;
+            onChange(
+              value === "spam"
+                ? { status: "all", exclusionReason: "spam" }
+                : { status: value as CategorizationStatus, exclusionReason: undefined },
+            );
+          }}
         >
           <option value="all">All</option>
           <option value="uncategorized">Uncategorized</option>
           <option value="categorized">Categorized</option>
+          <option value="spam">Marked as spam</option>
         </select>
       </div>
 

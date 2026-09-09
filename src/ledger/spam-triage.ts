@@ -31,9 +31,10 @@ export interface SpamCandidate extends UnnamedCounterparty {
 export async function findSpamCandidates(
   repositories: Repositories,
   workspaceId: string,
+  accountAddress?: string,
 ): Promise<SpamCandidate[]> {
   const [parties, familiar] = await Promise.all([
-    repositories.contacts.unnamedCounterparties(workspaceId, 500),
+    repositories.contacts.unnamedCounterparties(workspaceId, 500, accountAddress),
     repositories.contacts.familiarAssetCodes(workspaceId),
   ]);
 
@@ -126,4 +127,38 @@ export async function markAssetAsSpam(
   const result = await reapplyRules(repositories, workspaceId);
   log.info("asset marked as spam", { asset: asset.assetCode, changed: result.changed });
   return result.changed;
+}
+
+/**
+ * Marks a hand-picked set of entries as spam.
+ *
+ * Deliberately not a rule. A selection is "these rows", not a pattern, and
+ * there is usually no condition that describes it — inventing one would either
+ * be wrong or would quietly catch far more than was selected. The trade is that
+ * these do not cover what arrives next month, which is why the per-sender and
+ * per-asset actions exist alongside this one.
+ *
+ * Written as manual annotations, so a later rule run leaves them alone.
+ */
+export async function markEntriesAsSpam(
+  repositories: Repositories,
+  entryIds: readonly string[],
+): Promise<number> {
+  for (const id of entryIds) {
+    await repositories.annotations.setManual(id, { excluded: true, exclusionReason: "spam" });
+  }
+  log.info("entries marked as spam", { count: entryIds.length });
+  return entryIds.length;
+}
+
+/** Undoes the above, putting the entries back into the books. */
+export async function unmarkEntriesAsSpam(
+  repositories: Repositories,
+  entryIds: readonly string[],
+): Promise<number> {
+  for (const id of entryIds) {
+    await repositories.annotations.setManual(id, { excluded: false, exclusionReason: null });
+  }
+  log.info("entries restored from spam", { count: entryIds.length });
+  return entryIds.length;
 }

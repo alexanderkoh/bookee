@@ -9,9 +9,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useRepositories } from "../../app/providers/app-context";
 import { useCurrentWorkspace } from "../../app/providers/workspace-provider";
-import { UserPlus } from "lucide-react";
+import { ShieldAlert, UserPlus } from "lucide-react";
 import { Amount, CopyButton, Drawer, DirectionTag, formatDateTime } from "../../components";
 import { ContactForm } from "../contacts/ContactsScreen";
+import { markAssetAsSpam, markCounterpartyAsSpam } from "../../ledger/spam-triage";
+import { useToast } from "../../components";
 import type { LedgerEntryView } from "../../ledger/types";
 import type { MemoType } from "../../db/schema";
 
@@ -192,6 +194,8 @@ export function TransactionDetailDrawer({
             />
             Reimbursable
           </label>
+
+          <SpamActions entry={entry} />
         </div>
       </section>
 
@@ -264,5 +268,81 @@ export function TransactionDetailDrawer({
         />
       ) : null}
     </Drawer>
+  );
+}
+
+/**
+ * Marking spam from a transaction you are already looking at.
+ *
+ * Two scopes, because Stellar spam arrives in two shapes. A dust sender is one
+ * address repeating itself; an airdropped token is hundreds of addresses
+ * pushing the same worthless asset, and no per-sender marking would ever catch
+ * up with it. Both write a rule, so both cover what arrives next month too.
+ */
+function SpamActions({ entry }: { entry: LedgerEntryView }) {
+  const workspace = useCurrentWorkspace();
+  const repositories = useRepositories();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const [working, setWorking] = useState<"asset" | "sender" | null>(null);
+
+  async function run(scope: "asset" | "sender") {
+    setWorking(scope);
+    try {
+      const changed =
+        scope === "asset"
+          ? await markAssetAsSpam(repositories, workspace.id, {
+              assetId: entry.assetId,
+              assetCode: entry.assetCode,
+            })
+          : await markCounterpartyAsSpam(repositories, workspace.id, {
+              address: entry.counterpartyAddress!,
+              memo: entry.memoValue,
+            });
+      await queryClient.invalidateQueries();
+      toast.success(
+        "Marked as spam",
+        `${changed} ${changed === 1 ? "entry" : "entries"} excluded. A rule now covers it — undo on the Rules screen.`,
+      );
+    } finally {
+      setWorking(null);
+    }
+  }
+
+  if (entry.exclusionReason === "spam") {
+    return (
+      <p className="field__hint">
+        <ShieldAlert size={12} aria-hidden="true" /> Marked as spam by a rule. Delete that rule on
+        the Rules screen to bring it back.
+      </p>
+    );
+  }
+
+  return (
+    <div className="stack stack--sm">
+      <p className="field__hint">
+        Unsolicited dust? Marking writes a rule, so the next one is handled too.
+      </p>
+      <div className="row row--wrap row--sm">
+        <button
+          type="button"
+          className="button button--danger"
+          disabled={working !== null}
+          onClick={() => void run("asset")}
+        >
+          {working === "asset" ? "Marking…" : `Spam: all ${entry.assetCode}`}
+        </button>
+        {entry.counterpartyAddress ? (
+          <button
+            type="button"
+            className="button button--danger"
+            disabled={working !== null}
+            onClick={() => void run("sender")}
+          >
+            {working === "sender" ? "Marking…" : "Spam: this sender"}
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }

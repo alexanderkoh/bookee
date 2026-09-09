@@ -10,16 +10,19 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServices } from "../../app/providers/app-context";
 import { useCurrentWorkspace } from "../../app/providers/workspace-provider";
 import { useSync } from "../../app/providers/sync-provider";
-import { Plus, RefreshCw, Trash2, Wallet } from "lucide-react";
+import { Plus, RefreshCw, ShieldAlert, Trash2, Wallet } from "lucide-react";
 import {
   CopyButton,
   EmptyState,
   Modal,
   ModalClose,
   relativeTime,
+  shortAddress,
   useToast,
 } from "../../components";
 import { validateTrackableAddress } from "../../stellar/validation";
+import { SIGNAL_LABELS } from "../../ledger/spam";
+import { findSpamCandidates, markCounterpartyAsSpam } from "../../ledger/spam-triage";
 import { StellarError } from "../../stellar/errors";
 import { DuplicateAccountError } from "../../db/repositories";
 import type { Network, TrackedAccount } from "../../db/schema";
@@ -218,6 +221,8 @@ export function AccountsScreen() {
                     {(counts.data?.[account.id] ?? 0).toLocaleString()}
                   </dd>
                 </dl>
+                <AccountSpamSenders account={account} />
+
                 <div className="row">
                   <button
                     type="button"
@@ -293,5 +298,87 @@ function RemoveAccountDialog({
         </button>
       </ModalClose>
     </Modal>
+  );
+}
+
+/**
+ * Who is sending this particular account dust.
+ *
+ * Worth having per account rather than only workspace-wide: one address that
+ * has been published somewhere collects far more junk than the rest, and seeing
+ * that concentrated is what tells you the address itself is the problem.
+ */
+function AccountSpamSenders({ account }: { account: TrackedAccount }) {
+  const workspace = useCurrentWorkspace();
+  const { repositories } = useServices();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const [open, setOpen] = useState(false);
+  const [working, setWorking] = useState<string | null>(null);
+
+  const candidates = useQuery({
+    queryKey: ["spam-candidates", workspace.id, account.publicKey],
+    queryFn: () => findSpamCandidates(repositories, workspace.id, account.publicKey),
+  });
+
+  const found = candidates.data ?? [];
+  if (found.length === 0) return null;
+
+  return (
+    <div className="stack stack--sm">
+      <button
+        type="button"
+        className="disclosure-button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
+        <ShieldAlert size={13} aria-hidden="true" />
+        <span className="grow align-start">Possible spam senders</span>
+        <span className="tag tag--warning">{found.length}</span>
+      </button>
+
+      {open ? (
+        <ul className="stack stack--sm plain-list">
+          {found.map((candidate) => (
+            <li
+              className="row row--wrap row--sm"
+              key={`${candidate.address}:${candidate.memo ?? ""}`}
+            >
+              <span className="mono text-xs">{shortAddress(candidate.address, 6)}</span>
+              <span className="grow row row--wrap row--xs">
+                {candidate.assessment.signals.map((signal) => (
+                  <span className="tag" key={signal}>
+                    {SIGNAL_LABELS[signal]}
+                  </span>
+                ))}
+              </span>
+              <button
+                type="button"
+                className="button button--danger button--sm"
+                disabled={working !== null}
+                onClick={() => {
+                  const key = candidate.address;
+                  setWorking(key);
+                  void markCounterpartyAsSpam(repositories, workspace.id, {
+                    address: candidate.address,
+                    memo: candidate.memo,
+                  })
+                    .then(async (changed) => {
+                      await queryClient.invalidateQueries();
+                      toast.success(
+                        "Marked as spam",
+                        `${changed} ${changed === 1 ? "entry" : "entries"} excluded. Undo on the Rules screen.`,
+                      );
+                    })
+                    .finally(() => setWorking(null));
+                }}
+              >
+                {working === candidate.address ? "Marking…" : "Mark as spam"}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
