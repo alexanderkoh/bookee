@@ -72,6 +72,43 @@ immediately but usually requires a hardware token.
 No equivalent problem. AppImage, `.deb` and `.rpm` all install unsigned without
 ceremony.
 
+## In-app updates
+
+The sidebar notice can download and install a new version in place. Two
+independent keys are involved and they are easy to confuse:
+
+| Key | Purpose | Where it lives |
+| --- | --- | --- |
+| Apple / Authenticode certificates | Stop the OS warning on first launch | `APPLE_*`, `WINDOWS_*` secrets |
+| Updater (minisign) keypair | Prove an update came from this project | `TAURI_SIGNING_PRIVATE_KEY` secret; public half in `tauri.conf.json` |
+
+The updater key is generated once:
+
+```bash
+pnpm tauri signer generate -w ~/.tauri/bookee-updater.key
+```
+
+Put the **private** key in the `TAURI_SIGNING_PRIVATE_KEY` repository secret and
+its password in `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` (empty is allowed — the
+secret store is the protection). The **public** key belongs in
+`plugins.updater.pubkey` in `src-tauri/tauri.conf.json`, where it is compiled
+into the application.
+
+**Losing the private key is unrecoverable for installed copies.** Every build
+already in the wild will only accept updates signed by the matching key, so a
+new keypair means every existing user has to reinstall by hand. Back it up
+somewhere you would back up a signing certificate.
+
+The release workflow attaches `latest.json` next to the installers. The
+application reads it from `releases/latest/download/latest.json`, and GitHub
+resolves `latest` only to a release that is **published and not marked as a
+prerelease** — so in-app updates stay invisible until you clear both flags on
+the draft.
+
+`.deb` and `.rpm` installs are owned by the system package manager and are never
+replaced in place; those users are shown the release page instead. AppImage,
+macOS and Windows update in place.
+
 ## Cutting a release
 
 ```bash
@@ -91,9 +128,6 @@ pnpm tauri build --debug      # faster, unoptimised, for testing the bundle
 
 ## What is deliberately absent
 
-- **No auto-updater.** Tauri ships one, and it needs a signing keypair plus a
-  hosted update manifest. Out of scope for v0.1; the architecture does not block
-  it.
 - **No telemetry**, so there are no download or usage numbers. That is the
   trade for not phoning home.
 - **No app store distribution.** The Mac App Store requires sandboxing, which

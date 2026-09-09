@@ -101,9 +101,13 @@ from source, which is the option this project can actually vouch for.
 **The database is not encrypted.** Anyone with access to your user account can
 read it. Use full-disk encryption if that is a concern.
 
-**There is no auto-update.** Bookee checks whether a newer release exists and
-tells you; it never downloads or installs anything by itself. Updating is a
-thing you do deliberately.
+**Updates are never silent.** Bookee checks whether a newer release exists and
+tells you. It downloads nothing until you press the button, and it installs
+nothing that fails verification: every updater artifact is signed with the
+project's minisign key, and the public half is compiled into the application, so
+a tampered or unsigned build is rejected rather than run. Installs that a system
+package manager owns (`.deb`, `.rpm`) are not replaced in place — you are sent
+to the release page instead. Updating remains a thing you choose to do.
 
 ## Supported versions
 

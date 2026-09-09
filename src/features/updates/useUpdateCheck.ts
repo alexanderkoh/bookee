@@ -1,10 +1,12 @@
 /**
  * "A new version is available."
  *
- * Deliberately a *check*, not an auto-updater. Bookee never downloads or
- * installs anything by itself; it tells you a release exists and opens the page
- * so you decide. An application that silently replaces its own binary is a
- * different trust proposition to a read-only local ledger.
+ * A check, never an automatic install. This module only notices that a release
+ * exists; useUpdateInstall does the downloading, and not until the button is
+ * pressed. An application that silently replaces its own binary is a different
+ * trust proposition to a read-only local ledger, so the decision stays with the
+ * person using it, and an artifact that fails the signature check is discarded
+ * rather than installed.
  *
  * This is the only request the application makes to a host other than Horizon,
  * so it is disclosed in Settings and can be switched off. It is a plain

@@ -11,6 +11,25 @@ to you.
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-09-09
+
+### Fixed
+
+- **The overview crashed with React error #300 on a workspace with no tracked
+  accounts.** A `useMemo` sat below the empty-state return, so the render that
+  followed the accounts query resolving ran one hook fewer than the render
+  before it. `react-hooks/rules-of-hooks` was not enabled in the lint config and
+  so never flagged it; it is now an error, and CI runs lint before anything else.
+
+### Added
+
+- **In-app updates.** The sidebar notice can download and install a new version
+  instead of only linking to the release page. Nothing is fetched until you
+  press the button, and Tauri verifies every artifact against the project's
+  signing key before replacing anything — see
+  [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md). `.deb` and `.rpm` installs are
+  owned by the system package manager and still link out.
+
 ## [0.1.2] — 2026-08-31
 
 ### Changed
@@ -84,5 +103,6 @@ First release. Local-first, read-only bookkeeping for Stellar accounts.
 - Multiple independent ledgers
 - Installers for macOS, Windows and Linux
 
-[Unreleased]: https://github.com/alexanderkoh/bookee/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/alexanderkoh/bookee/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.3
 [0.1.2]: https://github.com/alexanderkoh/bookee/releases/tag/v0.1.2
