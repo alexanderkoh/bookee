@@ -85,8 +85,9 @@ export function SettingsScreen() {
           <p className="field__hint">
             Once a day, {BRANDING.appName} asks GitHub whether a newer release exists. This is the
             only request it makes to any host other than a Horizon endpoint. It sends no identifier
-            and nothing about your ledger, and it never downloads or installs anything — you are
-            shown a link. Currently running {CURRENT_VERSION}.
+            and nothing about your ledger. Nothing is downloaded until you ask for it, and an update
+            is installed only after {BRANDING.appName} verifies it against the project's signing
+            key. Currently running {CURRENT_VERSION}.
           </p>
         </div>
       </section>
