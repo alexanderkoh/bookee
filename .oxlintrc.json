@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "unicorn", "oxc"],
+  "plugins": ["react", "react-hooks", "typescript", "unicorn", "oxc"],
   "env": {
     "browser": true,
     "es2022": true
@@ -19,6 +19,10 @@
     // Sequential awaits are deliberate here. Cursor-based pagination cannot be
     // parallelised, and firing page requests concurrently would hammer Horizon.
     "no-await-in-loop": "off",
+    // Not on by default, and its absence let a conditionally-called useMemo
+    // ship in 0.1.2 (React error #300 on the overview). Hooks order is not a
+    // style question, so this is an error.
+    "react-hooks/rules-of-hooks": "error",
     "no-console": "warn",
     "eqeqeq": "error",
     "no-var": "error",

@@ -131,6 +131,27 @@ export function DashboardScreen() {
       repositories.entries.query({ workspaceId: workspace.id }, { limit: 5, offset: 0 }),
   });
 
+  // Default to the busiest asset; the selector only appears when there is a
+  // real choice, because a single-option toggle is just noise.
+  const series = activity.data ?? [];
+  const selected = series.find((s) => s.assetId === chartAssetId) ?? series[0] ?? null;
+
+  // Above the empty-state return below, deliberately. The accounts query
+  // resolves after the first render, so a workspace with no accounts renders
+  // once past this point and then takes that return; a hook placed below it
+  // would disappear from the second render's hook order.
+  const expenseBars = useMemo(() => {
+    if (!selected) return [];
+    return (categories.data ?? [])
+      .filter((row) => row.kind === "expense" && row.categoryId !== null)
+      .map((row) => ({
+        id: row.categoryId!,
+        label: row.categoryEmoji ? `${row.categoryEmoji}  ${row.categoryName}` : row.categoryName,
+        amount: row.totals.find((t) => t.assetId === selected.assetId)?.amount ?? "0",
+      }))
+      .filter((bar) => Number(bar.amount) > 0);
+  }, [categories.data, selected]);
+
   if (accounts.data && accounts.data.length === 0) {
     return (
       <EmptyState
@@ -147,23 +168,6 @@ export function DashboardScreen() {
   }
 
   const monthName = new Date().toLocaleDateString(undefined, { month: "long" });
-
-  // Default to the busiest asset; the selector only appears when there is a
-  // real choice, because a single-option toggle is just noise.
-  const series = activity.data ?? [];
-  const selected = series.find((s) => s.assetId === chartAssetId) ?? series[0] ?? null;
-
-  const expenseBars = useMemo(() => {
-    if (!selected) return [];
-    return (categories.data ?? [])
-      .filter((row) => row.kind === "expense" && row.categoryId !== null)
-      .map((row) => ({
-        id: row.categoryId!,
-        label: row.categoryEmoji ? `${row.categoryEmoji}  ${row.categoryName}` : row.categoryName,
-        amount: row.totals.find((t) => t.assetId === selected.assetId)?.amount ?? "0",
-      }))
-      .filter((bar) => Number(bar.amount) > 0);
-  }, [categories.data, selected]);
 
   return (
     <div className="stack">
