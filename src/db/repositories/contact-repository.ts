@@ -325,7 +325,15 @@ export class ContactRepository {
    * The workspace's own tracked accounts are excluded — they already have
    * labels, and an internal transfer does not need a contact.
    */
-  async unnamedCounterparties(workspaceId: string, limit = 100): Promise<UnnamedCounterparty[]> {
+  /**
+   * @param accountAddress narrows to counterparties of one tracked account,
+   * for the per-account view. Omitted, the whole workspace is considered.
+   */
+  async unnamedCounterparties(
+    workspaceId: string,
+    limit = 100,
+    accountAddress?: string,
+  ): Promise<UnnamedCounterparty[]> {
     const rows = await this.driver.select<SqlRow>(
       `SELECT
          e.counterparty_address AS address,
@@ -357,10 +365,11 @@ export class ContactRepository {
              AND t.network = e.network
              AND t.public_key = e.counterparty_address
          )
+         ${accountAddress ? "AND (e.from_address = ? OR e.to_address = ?)" : ""}
        GROUP BY e.counterparty_address, e.network, e.memo_value
        ORDER BY entry_count DESC, last_seen DESC
        LIMIT ?`,
-      [workspaceId, limit],
+      accountAddress ? [workspaceId, accountAddress, accountAddress, limit] : [workspaceId, limit],
     );
 
     return rows.map((row) => ({

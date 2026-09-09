@@ -328,6 +328,18 @@ describe("naming unknown parties from the ledger", () => {
     expect(emile!.entryCount).toBe(2);
   });
 
+  it("can narrow to the counterparties of one tracked account", async () => {
+    // The per-account view binds three parameters instead of one; getting the
+    // order wrong would silently filter on the limit or return the workspace.
+    const scoped = await repos.contacts.unnamedCounterparties(workspace.id, 100, SAMPLE_ACCOUNT);
+    expect(scoped.map((party) => party.address).toSorted()).toEqual([EMILE, OTHER].toSorted());
+
+    const elsewhere = await repos.contacts.unnamedCounterparties(workspace.id, 100, OTHER);
+    // OTHER only ever transacted with SAMPLE_ACCOUNT, so scoping to it finds
+    // that one relationship and not EMILE's separate dealings.
+    expect(elsewhere.map((party) => party.address)).not.toContain(EMILE);
+  });
+
   it("reports the span of activity so an address can be judged before naming", async () => {
     const [busiest] = await repos.contacts.unnamedCounterparties(workspace.id);
     expect(busiest!.firstSeen <= busiest!.lastSeen).toBe(true);

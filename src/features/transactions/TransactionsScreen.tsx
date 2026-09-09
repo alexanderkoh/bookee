@@ -12,7 +12,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useRepositories } from "../../app/providers/app-context";
 import { useCurrentWorkspace } from "../../app/providers/workspace-provider";
-import { SearchX } from "lucide-react";
+import { SearchX, ShieldAlert, Undo2, X } from "lucide-react";
 import {
   Amount,
   AssetIcon,
@@ -21,10 +21,13 @@ import {
   formatDate,
   shortAddress,
   useAssetIcons,
+  useToast,
 } from "../../components";
 import { TransactionFilters } from "./TransactionFilters";
 import { TransactionDetailDrawer } from "./TransactionDetailDrawer";
 import type { LedgerFilters } from "../../ledger/types";
+import { markEntriesAsSpam, unmarkEntriesAsSpam } from "../../ledger/spam-triage";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ROW_HEIGHT = 34;
 /** Rows are loaded in windows; large enough that scrolling rarely waits. */
@@ -42,6 +45,30 @@ export function TransactionsScreen() {
     ...(search.status === "uncategorized" ? { status: "uncategorized" as const } : {}),
   }));
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  /** Rows ticked for a bulk action. Ids, so it survives a refetch reordering. */
+  const [ticked, setTicked] = useState<ReadonlySet<string>>(new Set());
+  const [bulkWorking, setBulkWorking] = useState(false);
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  async function applyToTicked(action: "spam" | "restore") {
+    const ids = [...ticked];
+    setBulkWorking(true);
+    try {
+      if (action === "spam") await markEntriesAsSpam(repositories, ids);
+      else await unmarkEntriesAsSpam(repositories, ids);
+      setTicked(new Set());
+      await queryClient.invalidateQueries();
+      toast.success(
+        action === "spam" ? "Marked as spam" : "Restored",
+        action === "spam"
+          ? `${ids.length} ${ids.length === 1 ? "entry" : "entries"} excluded. These rows only — use "Spam: this sender" to cover future ones.`
+          : `${ids.length} ${ids.length === 1 ? "entry" : "entries"} back in the books.`,
+      );
+    } finally {
+      setBulkWorking(false);
+    }
+  }
   const [debouncedSearch, setDebouncedSearch] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -123,6 +150,42 @@ export function TransactionsScreen() {
         resultCount={total}
       />
 
+      {ticked.size > 0 ? (
+        <div className="panel panel--accent row row--wrap row--sm selection-bar" role="status">
+          <strong>{ticked.size}</strong>
+          <span className="grow">selected</span>
+          {/* Restoring is offered alongside marking rather than hidden behind
+              the spam filter, because the most likely moment to realise a
+              mistake is immediately after making it. */}
+          <button
+            type="button"
+            className="button"
+            disabled={bulkWorking}
+            onClick={() => void applyToTicked("restore")}
+          >
+            <Undo2 size={13} aria-hidden="true" />
+            Not spam
+          </button>
+          <button
+            type="button"
+            className="button button--danger"
+            disabled={bulkWorking}
+            onClick={() => void applyToTicked("spam")}
+          >
+            <ShieldAlert size={13} aria-hidden="true" />
+            {bulkWorking ? "Working…" : "Mark as spam"}
+          </button>
+          <button
+            type="button"
+            className="button button--subtle button--icon"
+            aria-label="Clear selection"
+            onClick={() => setTicked(new Set())}
+          >
+            <X size={13} aria-hidden="true" />
+          </button>
+        </div>
+      ) : null}
+
       {total === 0 && !rowsQuery.isFetching ? (
         <EmptyState
           icon={<SearchX size={20} />}
@@ -139,12 +202,16 @@ export function TransactionsScreen() {
               <col className="col-date" />
               <col className="col-counterparty" />
               <col />
+              <col className="col-tick" />
               <col className="col-category" />
               <col className="col-direction" />
               <col className="col-amount" />
             </colgroup>
             <thead>
               <tr>
+                <th scope="col" className="col-tick">
+                  <span className="visually-hidden">Select</span>
+                </th>
                 <th scope="col">Date</th>
                 <th scope="col">Counterparty</th>
                 <th scope="col">Memo</th>
@@ -163,7 +230,7 @@ export function TransactionsScreen() {
                 if (!entry) {
                   return (
                     <tr key={virtualRow.key} style={{ height: ROW_HEIGHT }} aria-hidden="true">
-                      <td colSpan={6} className="muted text-xs">
+                      <td colSpan={7} className="muted text-xs">
                         …
                       </td>
                     </tr>
@@ -182,6 +249,19 @@ export function TransactionsScreen() {
                       }
                     }}
                   >
+                    <td onClick={(event) => event.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={ticked.has(entry.id)}
+                        aria-label={`Select transaction from ${formatDate(entry.timestamp)}`}
+                        onChange={(event) => {
+                          const next = new Set(ticked);
+                          if (event.target.checked) next.add(entry.id);
+                          else next.delete(entry.id);
+                          setTicked(next);
+                        }}
+                      />
+                    </td>
                     <td className="text-xs muted nowrap">{formatDate(entry.timestamp)}</td>
                     <td className="truncate">
                       {entry.contactName ?? (
