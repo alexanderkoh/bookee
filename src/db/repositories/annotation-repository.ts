@@ -1,6 +1,6 @@
 import type { SqlDriver } from "../driver";
 import type { SqlRow } from "../row";
-import type { AnnotationSource, EntryAnnotation } from "../schema";
+import type { AnnotationSource, EntryAnnotation, ExclusionReason } from "../schema";
 import { mapAnnotation } from "./mappers";
 import { toDbBool } from "../schema";
 import { newId, nowIso } from "../../lib/ids";
@@ -10,6 +10,8 @@ export interface AnnotationChanges {
   categoryId?: string | null;
   note?: string | null;
   excluded?: boolean;
+  /** Why. Ignored unless `excluded` is true; cleared automatically when it is not. */
+  exclusionReason?: ExclusionReason | null;
   reimbursable?: boolean;
 }
 
@@ -77,9 +79,11 @@ export class AnnotationRepository {
     if (
       changes.excluded !== undefined &&
       existing?.excludedSource !== "manual" &&
-      (existing?.excluded ?? false) !== changes.excluded
+      ((existing?.excluded ?? false) !== changes.excluded ||
+        (existing?.exclusionReason ?? null) !== (changes.exclusionReason ?? null))
     ) {
       allowed.excluded = changes.excluded;
+      allowed.exclusionReason = changes.exclusionReason ?? null;
     }
 
     if (Object.keys(allowed).length === 0) return false;
@@ -95,6 +99,7 @@ export class AnnotationRepository {
            category_id = CASE WHEN category_source = 'rule' THEN NULL ELSE category_id END,
            note        = CASE WHEN note_source     = 'rule' THEN NULL ELSE note        END,
            excluded    = CASE WHEN excluded_source = 'rule' THEN 0    ELSE excluded    END,
+           exclusion_reason = CASE WHEN excluded_source = 'rule' THEN NULL ELSE exclusion_reason END,
            contact_source  = CASE WHEN contact_source  = 'rule' THEN NULL ELSE contact_source  END,
            category_source = CASE WHEN category_source = 'rule' THEN NULL ELSE category_source END,
            note_source     = CASE WHEN note_source     = 'rule' THEN NULL ELSE note_source     END,
@@ -118,10 +123,10 @@ export class AnnotationRepository {
     if (!existing) {
       await this.driver.execute(
         `INSERT INTO entry_annotations (
-           id, ledger_entry_id, contact_id, category_id, note, excluded, reimbursable,
-           contact_source, category_source, note_source, excluded_source, applied_rule_id,
-           created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           id, ledger_entry_id, contact_id, category_id, note, excluded, exclusion_reason,
+           reimbursable, contact_source, category_source, note_source, excluded_source,
+           applied_rule_id, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           newId(),
           ledgerEntryId,
@@ -129,6 +134,7 @@ export class AnnotationRepository {
           changes.categoryId ?? null,
           changes.note ?? null,
           toDbBool(changes.excluded ?? false),
+          changes.excluded ? (changes.exclusionReason ?? null) : null,
           toDbBool(changes.reimbursable ?? false),
           changes.contactId !== undefined ? source : null,
           changes.categoryId !== undefined ? source : null,
@@ -164,6 +170,10 @@ export class AnnotationRepository {
     }
     if (changes.excluded !== undefined) {
       set("excluded", toDbBool(changes.excluded));
+      // Un-excluding drops the reason with it: "why" is meaningless once the
+      // entry is back in the books, and a stale 'spam' would resurface in the
+      // spam review list.
+      set("exclusion_reason", changes.excluded ? (changes.exclusionReason ?? null) : null);
       set("excluded_source", source);
     }
     if (changes.reimbursable !== undefined) {

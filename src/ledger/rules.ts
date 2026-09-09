@@ -14,7 +14,7 @@
  */
 import { z } from "zod";
 import { compare } from "../lib/money";
-import type { Direction } from "../db/schema";
+import type { Direction, ExclusionReason } from "../db/schema";
 
 export const CONDITION_FIELDS = [
   "counterparty_address",
@@ -46,7 +46,16 @@ export const OPERATORS_BY_FIELD: Record<ConditionField, readonly ConditionOperat
   amount: ["greater_than", "less_than"],
 };
 
-export const ACTION_TYPES = ["set_contact", "set_category", "set_note", "set_excluded"] as const;
+export const ACTION_TYPES = [
+  "set_contact",
+  "set_category",
+  "set_note",
+  "set_excluded",
+  // Spam is its own action rather than a value on set_excluded, so that a rule
+  // written before spam existed keeps meaning exactly what it meant, and so the
+  // rules list can say "mark as spam" instead of "exclude, reason spam".
+  "set_spam",
+] as const;
 
 export type ActionType = (typeof ACTION_TYPES)[number];
 
@@ -167,6 +176,7 @@ export interface RuleOutcome {
   categoryId?: string;
   note?: string;
   excluded?: boolean;
+  exclusionReason?: ExclusionReason;
   /** The rule that set the first field, recorded for traceability. */
   ruleId?: string;
 }
@@ -211,6 +221,13 @@ export function evaluateRules(target: RuleTarget, rules: readonly ParsedRule[]):
         case "set_excluded":
           if (outcome.excluded === undefined) {
             outcome.excluded = action.value === "true" || action.value === "1";
+            outcome.ruleId ??= rule.id;
+          }
+          break;
+        case "set_spam":
+          if (outcome.excluded === undefined) {
+            outcome.excluded = true;
+            outcome.exclusionReason = "spam";
             outcome.ruleId ??= rule.id;
           }
           break;

@@ -62,7 +62,7 @@ const VIEW_SELECT = `
     e.counterparty_address, e.memo_type, e.memo_value, e.transaction_hash, e.operation_id,
     a.display_code AS asset_code, a.issuer AS asset_issuer,
     ${RESOLVED_CONTACT} AS contact_id,
-    an.category_id, an.note, an.excluded, an.reimbursable,
+    an.category_id, an.note, an.excluded, an.exclusion_reason, an.reimbursable,
     c.name AS contact_name,
     cat.name AS category_name, cat.emoji AS category_emoji, cat.kind AS category_kind
   FROM ledger_entries e
@@ -100,6 +100,7 @@ function mapView(row: Row): LedgerEntryView {
     categoryKind: row["category_kind"] ?? null,
     note: row["note"] ?? null,
     excluded: fromDbBool(row["excluded"]),
+    exclusionReason: row["exclusion_reason"] ?? null,
     reimbursable: fromDbBool(row["reimbursable"]),
   };
 }
@@ -142,7 +143,12 @@ function buildWhere(
   if (filters.status === "categorized") {
     conditions.push("an.category_id IS NOT NULL");
   }
-  if (!filters.includeExcluded) {
+  if (filters.exclusionReason) {
+    // Asking for one kind of exclusion is asking for excluded rows, so this
+    // deliberately overrides the default hiding rather than intersecting with it.
+    conditions.push("COALESCE(an.excluded, 0) = 1 AND an.exclusion_reason = ?");
+    params.push(filters.exclusionReason);
+  } else if (!filters.includeExcluded) {
     conditions.push("COALESCE(an.excluded, 0) = 0");
   }
   if (accountAddress) {

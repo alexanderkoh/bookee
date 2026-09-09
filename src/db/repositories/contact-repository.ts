@@ -69,6 +69,19 @@ export interface UnnamedCounterparty {
   lastSeen: string;
   /** Asset codes this address has transacted in, most frequent first. */
   assetCodes: string[];
+  /** Distinct amounts across the group; 1 means every payment was identical. */
+  distinctAmountCount: number;
+  /**
+   * The largest single amount, to 7dp.
+   *
+   * SQLite has no decimal type, so this is the one place a stored amount passes
+   * through a float. It is used only to ask "is everything here dust?", where
+   * the threshold is 0.01 and float error is many orders of magnitude away.
+   * Nothing in the books is computed from it.
+   */
+  largestAmount: string;
+  /** A few of the memos seen, for recognising advertising. */
+  memoSamples: string[];
 }
 
 export class ContactRepository {
@@ -324,13 +337,20 @@ export class ContactRepository {
          SUM(CASE WHEN e.direction = 'outgoing' THEN 1 ELSE 0 END) AS outgoing_count,
          MIN(e.timestamp)       AS first_seen,
          MAX(e.timestamp)       AS last_seen,
-         GROUP_CONCAT(DISTINCT a.display_code) AS asset_codes
+         GROUP_CONCAT(DISTINCT a.display_code) AS asset_codes,
+         COUNT(DISTINCT e.amount) AS distinct_amount_count,
+         MAX(CAST(e.amount AS REAL)) AS largest_amount,
+         GROUP_CONCAT(DISTINCT e.memo_value) AS memo_samples
        FROM ledger_entries e
        JOIN assets a ON a.id = e.asset_id
        ${RESOLUTION_JOIN}
        WHERE e.workspace_id = ?
          AND e.counterparty_address IS NOT NULL
          AND ${RESOLVED} IS NULL
+         -- An excluded entry is not waiting to be named. Without this, spam
+         -- kept every dust sender in the "unnamed parties" list and the badge
+         -- lit, so excluding it changed nothing the user could see.
+         AND COALESCE(an.excluded, 0) = 0
          AND NOT EXISTS (
            SELECT 1 FROM tracked_accounts t
            WHERE t.workspace_id = e.workspace_id
@@ -356,7 +376,34 @@ export class ContactRepository {
       assetCodes: String(row["asset_codes"] ?? "")
         .split(",")
         .filter(Boolean),
+      distinctAmountCount: row["distinct_amount_count"] ?? 0,
+      largestAmount: Number(row["largest_amount"] ?? 0).toFixed(7),
+      memoSamples: String(row["memo_samples"] ?? "")
+        .split(",")
+        .filter(Boolean)
+        .slice(0, 8),
     }));
+  }
+
+  /**
+   * Asset codes the workspace demonstrably deals in.
+   *
+   * An asset is familiar once it has been sent, or received from someone the
+   * user bothered to name. An airdropped token is neither, which is what makes
+   * "an asset you hold nowhere else" a usable signal rather than a description
+   * of every asset the ledger has ever seen.
+   */
+  async familiarAssetCodes(workspaceId: string): Promise<Set<string>> {
+    const rows = await this.driver.select<SqlRow>(
+      `SELECT DISTINCT a.display_code AS code
+         FROM ledger_entries e
+         JOIN assets a ON a.id = e.asset_id
+         ${RESOLUTION_JOIN}
+        WHERE e.workspace_id = ?
+          AND (e.direction = 'outgoing' OR ${RESOLVED} IS NOT NULL)`,
+      [workspaceId],
+    );
+    return new Set(rows.map((row) => String(row["code"])).filter(Boolean));
   }
 
   /**

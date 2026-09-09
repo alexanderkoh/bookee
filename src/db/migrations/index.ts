@@ -11,6 +11,7 @@ import icons003 from "./003_asset_icons.sql?raw";
 import prices004 from "./004_asset_prices.sql?raw";
 import memos005 from "./005_address_memos.sql?raw";
 import emoji006 from "./006_category_emoji.sql?raw";
+import reason007 from "./007_exclusion_reason.sql?raw";
 
 export interface Migration {
   version: number;
@@ -25,4 +26,5 @@ export const MIGRATIONS: readonly Migration[] = [
   { version: 4, name: "asset_prices", sql: prices004 },
   { version: 5, name: "address_memos", sql: memos005 },
   { version: 6, name: "category_emoji", sql: emoji006 },
+  { version: 7, name: "exclusion_reason", sql: reason007 },
 ];

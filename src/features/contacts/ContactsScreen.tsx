@@ -15,11 +15,19 @@ import {
   ArrowUpRight,
   ChevronRight,
   Plus,
+  ShieldAlert,
   Trash2,
   UserPlus,
   Users,
 } from "lucide-react";
-import { CopyButton, EmptyState, Drawer, formatDate, shortAddress } from "../../components";
+import {
+  CopyButton,
+  EmptyState,
+  Drawer,
+  formatDate,
+  shortAddress,
+  useToast,
+} from "../../components";
 import { formatDisplay } from "../../lib/money";
 import {
   AddressAlreadyAssignedError,
@@ -28,6 +36,12 @@ import {
 } from "../../db/repositories";
 import { validateTrackableAddress } from "../../stellar/validation";
 import { applyRules } from "../../ledger/apply-rules";
+import { SIGNAL_LABELS } from "../../ledger/spam";
+import {
+  findSpamCandidates,
+  markCounterpartyAsSpam,
+  type SpamCandidate,
+} from "../../ledger/spam-triage";
 
 const UNNAMED_OPEN_SETTING = "bookee.unnamed-parties-open";
 
@@ -35,6 +49,7 @@ export function ContactsScreen() {
   const workspace = useCurrentWorkspace();
   const repositories = useRepositories();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -53,6 +68,11 @@ export function ContactsScreen() {
   const contacts = useQuery({
     queryKey: ["contacts", workspace.id],
     queryFn: () => repositories.contacts.listWithCounts(workspace.id),
+  });
+
+  const spam = useQuery({
+    queryKey: ["spam-candidates", workspace.id],
+    queryFn: () => findSpamCandidates(repositories, workspace.id),
   });
 
   const unnamed = useQuery({
@@ -135,6 +155,58 @@ export function ContactsScreen() {
           </div>
         </section>
       )}
+
+      {(spam.data?.length ?? 0) > 0 ? (
+        <section className="panel panel--accent">
+          <div className="panel__header">
+            <h2 className="panel__title">
+              <ShieldAlert size={14} aria-hidden="true" />
+              Possible spam
+              <span className="tag tag--warning">{spam.data?.length}</span>
+            </h2>
+          </div>
+          <div className="panel__body stack stack--sm">
+            <p className="field__hint">
+              Dust nobody asked for, judged only by shape — never hidden until you say so. Marking
+              creates a rule, so the next batch from the same sender is handled too. If one of these
+              is real, name them instead and it will stop being suggested.
+            </p>
+            <div className="table-wrap">
+              <table className="table">
+                <caption className="visually-hidden">Counterparties that look like spam</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Address</th>
+                    <th scope="col">Why</th>
+                    <th scope="col">Seen</th>
+                    <th scope="col" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {spam.data?.map((candidate) => (
+                    <SpamRow
+                      key={`${candidate.address}:${candidate.memo ?? ""}`}
+                      candidate={candidate}
+                      onName={() => setNaming({ address: candidate.address, memo: candidate.memo })}
+                      onMark={async () => {
+                        const changed = await markCounterpartyAsSpam(repositories, workspace.id, {
+                          address: candidate.address,
+                          memo: candidate.memo,
+                        });
+                        await queryClient.invalidateQueries();
+                        toast.success(
+                          "Marked as spam",
+                          `${changed} ${changed === 1 ? "entry" : "entries"} excluded. A rule now covers this sender — undo it on the Rules screen.`,
+                        );
+                      }}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {(unnamed.data?.length ?? 0) > 0 ? (
         <section className="panel">
@@ -704,5 +776,74 @@ function ContactDetail({
         </p>
       </section>
     </Drawer>
+  );
+}
+
+/**
+ * One spam suggestion.
+ *
+ * The reasons are spelled out rather than reduced to a score, because the only
+ * person who can tell an airdrop from an unusual real payment is the one who
+ * knows what they were expecting.
+ */
+function SpamRow({
+  candidate,
+  onName,
+  onMark,
+}: {
+  candidate: SpamCandidate;
+  onName: () => void;
+  onMark: () => Promise<void>;
+}) {
+  const [working, setWorking] = useState(false);
+
+  return (
+    <tr>
+      <td>
+        <div className="copyable">
+          <span className="mono text-xs">{shortAddress(candidate.address)}</span>
+          <CopyButton value={candidate.address} label="address" />
+        </div>
+        {candidate.memo ? (
+          <div className="row row--sm">
+            <span className="tag">memo</span>
+            <span className="mono truncate text-xs" title={candidate.memo}>
+              {candidate.memo}
+            </span>
+          </div>
+        ) : null}
+      </td>
+      <td>
+        <div className="row row--wrap row--sm">
+          {candidate.assessment.signals.map((signal) => (
+            <span className="tag" key={signal}>
+              {SIGNAL_LABELS[signal]}
+            </span>
+          ))}
+        </div>
+      </td>
+      <td className="numeric align-start">
+        {candidate.entryCount}
+        <span className="muted"> × {candidate.assetCodes.join(", ") || "—"}</span>
+      </td>
+      <td>
+        <div className="row row--end row--sm">
+          <button type="button" className="button button--subtle" onClick={onName}>
+            Not spam — name them
+          </button>
+          <button
+            type="button"
+            className="button button--danger"
+            disabled={working}
+            onClick={() => {
+              setWorking(true);
+              void onMark().finally(() => setWorking(false));
+            }}
+          >
+            {working ? "Marking…" : "Mark as spam"}
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }

@@ -11,6 +11,23 @@ to you.
 
 ## [Unreleased]
 
+### Added
+
+- **Spam triage.** Contacts now surfaces counterparties that look like
+  unsolicited dust, with the reasons spelled out, and marking one writes a rule
+  so the next batch from the same sender is handled too. Nothing is ever hidden
+  automatically — the suggestion is shown, the judgement stays yours, and
+  "not spam, name them" removes it from the list just as effectively.
+  Exclusions now record *why*, so "kept out of my books" and "not my
+  transaction" are no longer the same flag.
+
+### Fixed
+
+- **Excluding a counterparty did not stop it being listed as unnamed.** The
+  unnamed-parties query ignored annotations entirely, so excluded dust kept the
+  Contacts badge lit and the sender in the worklist — which made excluding it
+  look like it had done nothing.
+
 ## [0.1.3] — 2026-09-09
 
 ### Fixed
