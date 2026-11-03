@@ -41,7 +41,7 @@
     "radix-ui": "^1.6.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@sqlite.org/sqlite-wasm": "3.53.0-build1",
